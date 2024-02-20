@@ -2,19 +2,12 @@ package main
 
 import (
 	"ewallet/internal/config"
-	"log/slog"
-	"os"
-)
-
-const (
-	envLocal = "local"
-	envDev   = "dev"
-	//envProd  = "prod"
+	"ewallet/internal/logger"
 )
 
 func main() {
 	cfg := config.MustLoad()
-	log := setupLogger(cfg.Env)
+	log := logger.SetupLogger(cfg.Env)
 
 	log.Info("starting ewallet")
 
@@ -22,22 +15,6 @@ func main() {
 
 	//TODO: init router: http-server
 
-}
-
-func setupLogger(env string) *slog.Logger {
-	var log *slog.Logger
-	switch env {
-	case envLocal:
-		log = slog.New(
-			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
-		)
-	case envDev:
-		log = slog.New(
-			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
-		)
-	}
-
-	return log
 }
 
 // обработка транзакций платёжной системы. В виде HTTP сервера на REST API

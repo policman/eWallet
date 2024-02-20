@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -8,9 +9,9 @@ import (
 )
 
 type Config struct {
-	Env         string `yaml:"env" env-default:"local"`
-	StoragePath string `yaml:"storage_path" env-required:"true"`
-	HTTPServer  `yaml:"http_server"`
+	Env        string `yaml:"env" env-default:"local"`
+	Storage    `yaml:"storage"`
+	HTTPServer `yaml:"http_server"`
 }
 
 type HTTPServer struct {
@@ -19,12 +20,18 @@ type HTTPServer struct {
 	IdleTimeout string `yaml:"idle_timeout" env-default:"60s"`
 }
 
-func MustLoad() *Config {
-	configPath := "../../config/config.yaml" //os.Getenv("CONFIG_PATH")
+type Storage struct {
+	StoragePath string `yaml:"storage_path" env-required:"true"`
+	Host        string `yaml:"host" env-default:"localhost"`
+	Port        string `yaml:"port" env-required:"true"`
+	Database    string `yaml:"database" env-required:"true"`
+	UserName    string `yaml:"username" env-default:"user"`
+	Password    string `yaml:"password" env-default:"password"`
+	MaxAttempts int    `yaml:"max_attempts" env-default:"5"`
+}
 
-	//if configPath == "" {
-	//	log.Fatal("CONFIG_PATH is not set")
-	//}
+func MustLoad() *Config {
+	configPath := "./config/config.yaml"
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("config file does not exist: %s", configPath)
@@ -36,5 +43,6 @@ func MustLoad() *Config {
 		log.Fatalf("cannot read config: %s", err)
 	}
 
+	fmt.Println("config read")
 	return &cfg
 }

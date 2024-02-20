@@ -2,6 +2,7 @@ package postgresql
 
 import (
 	"context"
+	"ewallet/internal/config"
 	"ewallet/utils"
 	"fmt"
 	"github.com/jackc/pgx/v5"
@@ -11,11 +12,6 @@ import (
 	"time"
 )
 
-type StorageConfig struct {
-	username, password, host, port, database string
-	maxAttempts                              int
-}
-
 type Client interface {
 	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
@@ -24,8 +20,8 @@ type Client interface {
 	BeginTx(ctx context.Context, txOptions pgx.TxOptions)
 }
 
-func NewClient(ctx context.Context, sc StorageConfig) (pool *pgxpool.Pool, err error) {
-	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", sc.username, sc.password, sc.host, sc.port, sc.database)
+func NewClient(ctx context.Context, sc config.Config) (pool *pgxpool.Pool, err error) {
+	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", sc.UserName, sc.Password, sc.Host, sc.Port, sc.Database)
 	err = utils.DoWithTries(func() error {
 		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
@@ -36,7 +32,7 @@ func NewClient(ctx context.Context, sc StorageConfig) (pool *pgxpool.Pool, err e
 		}
 
 		return nil
-	}, sc.maxAttempts, 5*time.Second)
+	}, sc.MaxAttempts, 5*time.Second)
 	if err != nil {
 		log.Fatal("error tries to connect postgresql")
 	}
