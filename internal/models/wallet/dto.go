@@ -1,10 +1,5 @@
-package operation
-
-import "ewallet/internal/models/wallet"
+package wallet
 
 type CreateOperationDTO struct {
-	Time   string        `json:"time"`
-	FromID wallet.Wallet `json:"fromId"`
-	ToID   wallet.Wallet `json:"toId"`
-	Amount int           `json:"amount"`
+	Balance int `json:"balance"`
 }

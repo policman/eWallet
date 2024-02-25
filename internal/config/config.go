@@ -21,17 +21,17 @@ type HTTPServer struct {
 }
 
 type Storage struct {
-	StoragePath string `yaml:"storage_path" env-required:"true"`
+	//StoragePath string `yaml:"storage_path" env-required:"true"`
 	Host        string `yaml:"host" env-default:"localhost"`
 	Port        string `yaml:"port" env-required:"true"`
 	Database    string `yaml:"database" env-required:"true"`
-	UserName    string `yaml:"username" env-default:"user"`
-	Password    string `yaml:"password" env-default:"password"`
+	UserName    string `yaml:"username"`
+	Password    string `yaml:"password"`
 	MaxAttempts int    `yaml:"max_attempts" env-default:"5"`
 }
 
 func MustLoad() *Config {
-	configPath := "./config/config.yaml"
+	configPath := "../../config/config.yaml"
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("config file does not exist: %s", configPath)

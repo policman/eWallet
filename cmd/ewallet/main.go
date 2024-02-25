@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
 	"ewallet/internal/config"
 	"ewallet/internal/logger"
+	operationDb "ewallet/internal/models/operation/db"
+	"ewallet/internal/storage/postgresql"
+	"time"
 )
 
 func main() {
@@ -11,8 +15,27 @@ func main() {
 
 	log.Info("starting ewallet")
 
-	//TODO: init storage: postgresql psx
+	pgxPoolClient, err := postgresql.NewClient(context.TODO(), cfg)
+	if err != nil {
+		log.Error("error with getting pgx pool: ", err)
+	}
 
+	//repositoryWallet := walletDb.NewRepository(pgxPoolClient, log)
+	repositoryOperation := operationDb.NewRepository(pgxPoolClient, log)
+
+	loc, err := time.LoadLocation("UTC")
+	if err != nil {
+		log.Error("err with get location", err)
+	}
+	timeToInsert := time.Date(2024, time.July, 15, 10, 30, 0, 0, loc)
+	isCreated, err := repositoryOperation.Create(context.TODO(), timeToInsert,
+		"752224ff-bfae-4581-8bce-3ab9911e7cd2", "6bed2193-1359-4e46-b6dd-490194a717b8", 40)
+	if err != nil {
+		log.Error("err with get location", err)
+	}
+	if isCreated {
+		log.Info("operation creating successful")
+	}
 	//TODO: init router: http-server
 
 }
